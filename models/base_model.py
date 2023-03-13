@@ -17,18 +17,30 @@ class BaseModel:
     created_at = datetime.datetime.now()
     updated_at = created_at
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Initalizes an instance of any
         object that inherits this class
         """
+
+        if kwargs is not None:
+            for key, value in kwargs.items():
+                if key.startswith("_"):
+                    continue
+                if key == "created_at" or key == "updated_at":
+                    value = datetime.datetime.strptime(value,
+                            "%Y-%m-%dT%H:%M:%S.%f")
+                self.key = value
 
 
     def __str__(self):
         """Format "print" function for this class"""
 
-        dicts = {k:v for k, v in type(self).__dict__.items()if not
+        dicts = {k:v for k, v in self.__dict__.items() if not
                 k.startswith("_") and not callable(v)}
-        return "[BaseModel] ({}) {}".format(self.id, dicts)
+        dicts["id"] = type(self).id
+        dicts["created_at"] = type(self).created_at
+        dicts["updated_at"] = type(self).updated_at
+        return "[BaseModel] ({}) {}".format(type(self).id, dicts)
 
     def save(self):
         """Updates the updated_at attribute with the current datetime"""
