@@ -6,6 +6,7 @@ import uuid
 import cmd
 import datetime
 import json
+import models
 
 class BaseModel:
     """The superclass for other classes. 
@@ -22,7 +23,7 @@ class BaseModel:
         object that inherits this class
         """
 
-        if kwargs is not None:
+        if len(kwargs) != 0:
             for key, value in kwargs.items():
                 if key.startswith("_"):
                     continue
@@ -30,21 +31,23 @@ class BaseModel:
                     value = datetime.datetime.strptime(value,
                             "%Y-%m-%dT%H:%M:%S.%f")
                 self.key = value
-
+        else:
+            models.storage.new(self)
 
     def __str__(self):
         """Format "print" function for this class"""
 
         dicts = {k:v for k, v in self.__dict__.items() if not
                 k.startswith("_") and not callable(v)}
-        dicts["id"] = type(self).id
-        dicts["created_at"] = type(self).created_at
-        dicts["updated_at"] = type(self).updated_at
-        return "[BaseModel] ({}) {}".format(type(self).id, dicts)
+        dicts["id"] = (self).id
+        dicts["created_at"] = (self).created_at
+        dicts["updated_at"] = (self).updated_at
+        return "[{}] ({}) {}".format(self.__class__.__name__, (self).id, dicts)
 
     def save(self):
         """Updates the updated_at attribute with the current datetime"""
 
+        models.storage.save()
         self.updated_at = datetime.datetime.now()
 
     def to_dict(self):
@@ -54,10 +57,9 @@ class BaseModel:
 
         d = {k:v for k, v in self.__dict__.items() if not k.startswith('_') and not callable(v)}
         my_dict = d.copy()
-        my_dict["id"] = type(self).id
-        my_dict["created_at"] = type(self).created_at.isoformat()
+        my_dict["id"] = (self).id
+        my_dict["created_at"] = (self).created_at.isoformat()
         my_dict["updated_at"] = self.updated_at.isoformat()
         my_dict["__class__"] = type(self).__name__
-#        my_dict_json = json.dumps(my_dict)
 
         return my_dict
