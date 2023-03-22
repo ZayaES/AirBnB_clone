@@ -83,15 +83,6 @@ class HBNBCommand(cmd.Cmd):
 
         return True
 
-    """def do_quit(self, arg):
-        """Quit command to exit the program."""
-        return True
-
-    def do_EOF(self, arg):
-        """EOF signal to exit the program."""
-        print("")
-        return True"""
-
     def do_create(self, arg):
         """Usage: create <class>
         Create a new class instance and print its id.
