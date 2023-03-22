@@ -18,13 +18,9 @@ class FileStorage:
     """
     __file_path = "file.json"
     __objects = {}
-    print("check")
-    print(__objects)
 
     def all(self):
         """Return the dictionary __objects."""
-        print("all used")
-        print(FileStorage.__objects)
         return FileStorage.__objects
 
     def new(self, obj):
@@ -52,7 +48,6 @@ class FileStorage:
 
     def reload(self):
         """Deserialize the JSON file __file_path to __objects, if it exists."""
-        print("reload preuse")
         try:
             with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
                 objdict = json.load(f)
@@ -62,4 +57,3 @@ class FileStorage:
                     self.new(eval(cls_name)(**o))
         except FileNotFoundError:
             pass
-        print("reload postuse")

@@ -3,7 +3,6 @@
 and for defining certain operations"""
 from models.engine.file_storage import FileStorage
 
-print("preuse")
+#print("preuse")
 storage = FileStorage()
 storage.reload()
-print("post_use")
