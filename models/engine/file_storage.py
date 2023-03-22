@@ -28,28 +28,17 @@ class FileStorage:
         ocname = obj.__class__.__name__
         FileStorage.__objects["{}.{}".format(ocname, obj.id)] = obj
 
-    """def save(self):
-        Serialize __objects to the JSON file __file_path.""
-        from models.base_model import BaseModel
-        #from models.user import User
+    def save(self):
+        """Serialize __objects to the JSON file __file_path."""
         odict = FileStorage.__objects
         objdict = {obj: odict[obj].to_dict() for obj in odict.keys()}
         with open(FileStorage.__file_path, "w") as f:
-            json.dump(objdict, f)"""
-    def save(self):
-        """serialize the file path to JSON file path
-        """
-        my_dict = {}
-        for key, value in self.__objects.items():
-            my_dict[key] = value.to_dict()
-        with open(self.__file_path, 'w', encoding="UTF-8") as f:
-            json.dump(my_dict, f)
-
+            json.dump(objdict, f)
 
     def reload(self):
         """Deserialize the JSON file __file_path to __objects, if it exists."""
         try:
-            with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
+            with open(FileStorage.__file_path) as f:
                 objdict = json.load(f)
                 for o in objdict.values():
                     cls_name = o["__class__"]

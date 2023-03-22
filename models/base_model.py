@@ -1,65 +1,49 @@
 #!/usr/bin/python3
-
-"""Defines all common attributes/methods for other classes """
-
-import uuid
-import cmd
-import datetime
-import json
+"""Defines the BaseModel class."""
 import models
+from uuid import uuid4
+from datetime import datetime
+
 
 class BaseModel:
-    """The superclass for other classes. 
-    Containes attributes and methods general
-    to all instances.
-    """
-
-    id = str(uuid.uuid4())
-    created_at = datetime.datetime.now()
-    updated_at = created_at
+    """Represents the BaseModel of the HBnB project."""
 
     def __init__(self, *args, **kwargs):
-        """Initalizes an instance of any
-        object that inherits this class
+        """Initialize a new BaseModel.
+        Args:
+            *args (any): Unused.
+            **kwargs (dict): Key/value pairs of attributes.
         """
-
+        tform = "%Y-%m-%dT%H:%M:%S.%f"
+        self.id = str(uuid4())
+        self.created_at = datetime.today()
+        self.updated_at = datetime.today()
         if len(kwargs) != 0:
-            for key, value in kwargs.items():
-                if key.startswith("_"):
-                    continue
-                if key == "created_at" or key == "updated_at":
-                    value = datetime.datetime.strptime(value,
-                            "%Y-%m-%dT%H:%M:%S.%f")
-                self.key = value
+            for k, v in kwargs.items():
+                if k == "created_at" or k == "updated_at":
+                    self.__dict__[k] = datetime.strptime(v, tform)
+                else:
+                    self.__dict__[k] = v
         else:
             models.storage.new(self)
 
-    def __str__(self):
-        """Format "print" function for this class"""
-
-        dicts = {k:v for k, v in self.__dict__.items() if not
-                k.startswith("_") and not callable(v)}
-        dicts["id"] = (self).id
-        dicts["created_at"] = (self).created_at
-        dicts["updated_at"] = (self).updated_at
-        return "[{}] ({}) {}".format(self.__class__.__name__, (self).id, dicts)
-
     def save(self):
-        """Updates the updated_at attribute with the current datetime"""
-
+        """Update updated_at with the current datetime."""
+        self.updated_at = datetime.today()
         models.storage.save()
-        self.updated_at = datetime.datetime.now()
 
     def to_dict(self):
-        """returns a dictionary containing all key-value pairs of __dict__
-        of the instance
+        """Return the dictionary of the BaseModel instance.
+        Includes the key/value pair __class__ representing
+        the class name of the object.
         """
+        rdict = self.__dict__.copy()
+        rdict["created_at"] = self.created_at.isoformat()
+        rdict["updated_at"] = self.updated_at.isoformat()
+        rdict["__class__"] = self.__class__.__name__
+        return rdict
 
-        d = {k:v for k, v in self.__dict__.items() if not k.startswith('_') and not callable(v)}
-        my_dict = d.copy()
-        my_dict["id"] = (self).id
-        my_dict["created_at"] = (self).created_at.isoformat()
-        my_dict["updated_at"] = self.updated_at.isoformat()
-        my_dict["__class__"] = type(self).__name__
-
-        return my_dict
+    def __str__(self):
+        """Return the print/str representation of the BaseModel instance."""
+        clname = self.__class__.__name__
+        return "[{}] ({}) {}".format(clname, self.id, self.__dict__)
